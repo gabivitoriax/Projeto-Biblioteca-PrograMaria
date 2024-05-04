@@ -1,20 +1,21 @@
 const express = require("express")
-const router = express.Router()
 const conectaBancoDeDados = require('./bancoDeDados.js')
-conectaBancoDeDados()
-
-const Livro = require("./livro.js")
-
+const cors = require('cors')
+const router = express.Router()
 const app = express()
+const Livro = require('./livroModel.js')
+
+conectaBancoDeDados()
+app.use(cors())
 app.use(express.json())
-const porta = 3333
+
+const PORTA = 4444
 
 // GET
 async function mostraLivros(request, response) {
     try {
         const livrosVindosDoBancoDeDados = await Livro.find()
-
-        response.json(livrosVindosDoBancoDeDados)
+        response.status(200).json(livrosVindosDoBancoDeDados)
     } catch(erro) {
         console.log(erro)
     }
@@ -38,7 +39,7 @@ async function criaLivros(request, response) {
 //PATCH
 async function corrigeLivro(request, response) {
     try {
-        const livroEncontrado = await Livro.findById(request.params.id)
+        const livroEncontrado = await Livro.findById({_id: request.params.id})
 
         if (request.body.nome) {
             livroEncontrado.nome = request.body.nome
@@ -64,18 +65,20 @@ async function deletaLivro(request, response) {
     try {
         await Livro.findByIdAndDelete(request.params.id)
         
-        response.json({mensagem: 'Livro deletado com sucesso'})
+        response.json({message: 'Livro deletado com sucesso'})
     } catch(erro) {
         console.log(erro)
     }
 }
 
+//ROTAS
 app.use(router.get('/livros', mostraLivros))
 app.use(router.post('/livros', criaLivros))
 app.use(router.patch('/livros/:id', corrigeLivro))
 app.use(router.delete('/livros', deletaLivro))
-app.listen(porta, mostraPorta)
 
 function mostraPorta() {
-    console.log('Servidor criado e rodadno na porta', porta)
+    console.log(`Servidor criado e rodadno na porta', ${PORTA}`)
 }
+
+app.listen(PORTA, mostraPorta)

@@ -15,4 +15,4 @@ const LivroSchema = new mongoose.Schema({
     }
 })
 
-module.exports = mongoose.model('BestSeller', LivroSchema)
+module.exports = mongoose.model('livro', LivroSchema)
