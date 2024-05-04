@@ -39,7 +39,11 @@ async function criaLivros(request, response) {
 //PATCH
 async function corrigeLivro(request, response) {
     try {
-        const livroEncontrado = await Livro.findById({_id: request.params.id})
+        const livroEncontrado = await Livro.findById(request.params.id)
+
+        if (!livroEncontrado) {
+            return response.status(404).json({ message: 'Livro não encontrado'})
+        }
 
         if (request.body.nome) {
             livroEncontrado.nome = request.body.nome
@@ -57,6 +61,7 @@ async function corrigeLivro(request, response) {
         response.json(livroAtualizadoNoBancoDeDados)
     } catch(erro) {
         console.log(erro)
+        response.status(500).json({ message: 'Erro interno do servidor' })
     }
 }
 
@@ -72,13 +77,14 @@ async function deletaLivro(request, response) {
 }
 
 //ROTAS
-app.use(router.get('/livros', mostraLivros))
-app.use(router.post('/livros', criaLivros))
-app.use(router.patch('/livros/:id', corrigeLivro))
-app.use(router.delete('/livros', deletaLivro))
+router.get('/livros', mostraLivros)
+router.post('/livros', criaLivros)
+router.patch('/livros/:id', corrigeLivro)
+router.delete('/livros/:id', deletaLivro)
 
 function mostraPorta() {
     console.log(`Servidor criado e rodadno na porta', ${PORTA}`)
 }
 
+app.use('/', router)
 app.listen(PORTA, mostraPorta)

@@ -11,7 +11,7 @@ const LivroSchema = new mongoose.Schema({
     },
     categoria: {
         type: String,
-        required: true,
+        required: true
     }
 })
 
